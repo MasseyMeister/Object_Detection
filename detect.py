@@ -8,7 +8,6 @@ from object_detector import ObjectDetector
 from object_detector import ObjectDetectorOptions
 from tracker import Tracker
 
-
 # Initialize Tracker
 tracker = Tracker()
 
@@ -23,7 +22,9 @@ def run(
     time_limit=30
 ) -> None:
 
-    """Continuously run inference on images acquired from the camera.
+    """
+    Continuously run inference on images acquired from the camera.
+
     Args:
     model: Name of the TFLite object detection model.
     camera_id: The camera id to be passed to OpenCV.
