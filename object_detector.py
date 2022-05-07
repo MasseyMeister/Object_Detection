@@ -16,12 +16,10 @@
 import json
 import platform
 from typing import List, NamedTuple
-
 import cv2
 import numpy as np
 from tflite_support import metadata
 
-# pylint: disable=g-import-not-at-top
 try:
     # Import TFLite interpreter from tflite_runtime package if it's available.
     from tflite_runtime.interpreter import Interpreter
@@ -152,10 +150,10 @@ class ObjectDetector:
         input_detail = interpreter.get_input_details()[0]
 
         # From TensorFlow 2.6, the order of the outputs become undefined.
-        # Therefore we need to sort the tensor indices of TFLite outputs and to know
-        # exactly the meaning of each output tensor. For example, if
-        # output indices are [601, 599, 598, 600], tensor names and indices aligned
-        # are:
+        # Therefore we need to sort the tensor indices of TFLite outputs
+        # and to know exactly the meaning of each output tensor. For example,
+        # if output indices are [601, 599, 598, 600], tensor names and indices
+        # aligned are:
         #   - location: 598
         #   - category: 599
         #   - score: 600
@@ -180,9 +178,10 @@ class ObjectDetector:
         """Run detection on an input image.
 
         Args:
-            input_image: A [height, width, 3] RGB image. Note that height and width
-              can be anything since the image will be immediately resized according
-              to the needs of the model within this function.
+            input_image: A [height, width, 3] RGB image.
+            Note that height and width can be anything since
+            the image will be immediately resized according
+            to the needs of the model within this function.
 
         Returns:
             A Person instance.
@@ -208,8 +207,6 @@ class ObjectDetector:
 
         # Resize the input
         input_tensor = cv2.resize(input_image, self._input_size)
-        
-        
         # Normalize the input if it's a float model (aka. not quantized)
         if not self._is_quantized_input:
             input_tensor = (np.float32(input_tensor) - self._mean) / self._std
@@ -239,8 +236,8 @@ class ObjectDetector:
         Args:
             boxes: Bounding boxes of detected objects from the TFLite model.
             classes: Class index of the detected objects from the TFLite model.
-            scores: Confidence scores of the detected objects from the TFLite model.
-            count: Number of detected objects from the TFLite model.
+            scores: Confidence scores of the detected objects from the TFLite
+            model.count: Number of detected objects from the TFLite model.
             image_width: Width of the input image.
             image_height: Height of the input image.
 
@@ -268,8 +265,6 @@ class ObjectDetector:
                                    categories=[category])
                 results.append(result)
 
-                #print (results)
-
         # Sort detection results by score ascending
         sorted_results = sorted(
             results,
@@ -281,15 +276,15 @@ class ObjectDetector:
         if self._options.label_deny_list is not None:
             filtered_results = list(
                 filter(
-                    lambda detection: detection.categories[0].label not in self.
-                    _options.label_deny_list, filtered_results))
+                    lambda detection: detection.categories[0].label
+                    not in self._options.label_deny_list, filtered_results))
 
         # Keep only detections in allow list
         if self._options.label_allow_list is not None:
             filtered_results = list(
                 filter(
-                    lambda detection: detection.categories[0].label in self._options.
-                    label_allow_list, filtered_results))
+                    lambda detection: detection.categories[0].label
+                    in self._options.label_allow_list, filtered_results))
 
         # Only return maximum of max_results detection.
         if self._options.max_results > 0:
